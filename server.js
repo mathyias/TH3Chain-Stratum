@@ -1,12 +1,12 @@
 var myCoin = {
-    "name": "Ravencoin",
-    "symbol": "RVN",
+    "name": "TH3Chain",
+    "symbol": "TH3",
     "algorithm": "kawpow",
-     "peerMagic": "5241564e",
-     "peerMagicTestnet": "52564e54"
+     "peerMagic": "54483321",
+     "peerMagicTestnet": "54483321"
 };
 
-var Stratum = require('kawpow_personal_stratum_server');
+var Stratum = require('./lib');
 
 var pool = Stratum.createPool({
 
@@ -14,7 +14,7 @@ var pool = Stratum.createPool({
 
 //    "auxes": [],
 
-    "address": "mufpGCucKyxh1ahcaCAqp6URzhdTnoJaas", //Address to where block rewards are given
+    "address": "TMayfrrfFTqjNf4esHnXYpFX3MfQ6Qs9BV", //Address to where block rewards are given
 
     /* Block rewards go to the configured pool wallet address to later be paid out to miners,
        except for a percentage that can go to, for examples, pool operator(s) as pool fees or
@@ -27,7 +27,7 @@ var pool = Stratum.createPool({
         /* 0.1% donation to NOMP. This pubkey can accept any type of coin, please leave this in
            your config to help support NOMP development. */
     //    "22851477d63a085dbc2398c8430af1c09e7343f6": 0.1
-         "mfduwzidNhyRNanyDopjAtAuKQSGLW6rYb": 1.5    
+         "TMayfrrfFTqjNf4esHnXYpFX3MfQ6Qs9BV": 1.5    
     },
 
     "blockRefreshInterval": 1000, //How often to poll RPC daemons for new blocks, in milliseconds
@@ -101,9 +101,9 @@ var pool = Stratum.createPool({
     "daemons": [
         {   //Main daemon instance
             "host": "127.0.0.1",
-            "port": 18766,
-            "user": "my-user-if",
-            "password": "my-pw"
+            "port": 8766,
+            "user": "th3rpc",
+            "password": "mocnehaslo"
         // },
         // {   //Backup daemon instance
         //     "host": "127.0.0.1",
@@ -124,7 +124,7 @@ var pool = Stratum.createPool({
         "host": "127.0.0.1",
 
         /* Port configured for daemon (this is the actual peer port not RPC port) mainnet:8767, tesnet:18770 */
-        "port": 18770,
+        "port": 8767,
 
         /* If your coin daemon is new enough (i.e. not a shitcoin) then it will support a p2p
            feature that prevents the daemon from spamming our peer node with unnecessary
