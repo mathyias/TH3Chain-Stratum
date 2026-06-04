@@ -1,3 +1,5 @@
+var fs = require('fs');
+
 var myCoin = {
     "name": "TH3Chain",
     "symbol": "TH3",
@@ -144,6 +146,28 @@ var pool = Stratum.createPool({
 });
 
 pool.on('share', function(isValidShare, isValidBlock, data){
+
+    if (isValidShare) {
+    var worker = data.worker || "unknown";
+    var address = worker.split(".")[0];
+
+    var shareRecord = {
+        time: new Date().toISOString(),
+        address: address,
+        worker: worker,
+        validShare: isValidShare,
+        validBlock: isValidBlock,
+        height: data.height,
+        difficulty: data.difficulty,
+        shareDiff: data.shareDiff,
+        blockHash: data.blockHash || null
+    };
+
+    fs.appendFileSync(
+        "shares.jsonl",
+        JSON.stringify(shareRecord) + "\n"
+    );
+}
 
     if (isValidBlock)
         console.log('Block found');
