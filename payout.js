@@ -1,10 +1,15 @@
 const fs = require('fs');
+const { execSync } = require('child_process');
 
 const REWARD_PER_BLOCK = 2137;
 const MIN_PAYOUT = 1;
 
 const STATE_FILE = 'pool-state.json';
 const SHARES_FILE = 'shares.jsonl';
+
+const RAVEN_CLI = '/home/ubuntu/TH3Coin/src/raven-cli';
+
+const SEND = process.argv.includes('--send');
 
 const state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
 const paidUntilHeight = state.paid_until_height || 0;
@@ -61,7 +66,8 @@ for (const [addr, data] of Object.entries(miners)) {
 }
 
 console.log('');
-console.log('=== TH3 POOL PAYOUT DRY RUN ===');
+console.log('=== TH3 POOL PAYOUT ===');
+console.log('Mode:', SEND ? 'SEND REAL PAYOUT' : 'DRY RUN');
 console.log('Paid until height:', paidUntilHeight);
 console.log('Max height to mark paid:', maxHeight);
 console.log('Total shares:', totalShares);
@@ -73,12 +79,57 @@ console.log('Payouts:');
 console.log(JSON.stringify(payouts, null, 2));
 console.log('');
 
-console.log('RPC command preview:');
-console.log(
-    './src/raven-cli sendmany "" ' +
-    "'" + JSON.stringify(payouts) + "'"
-);
-console.log('');
+if (Object.keys(payouts).length === 0) {
+    console.log('Nothing to pay.');
+    process.exit(0);
+}
 
-console.log('After successful payout, update pool-state.json to:');
-console.log(JSON.stringify({ paid_until_height: maxHeight }, null, 2));
+if (!SEND) {
+    console.log('Dry run only. To send real payout, run:');
+    console.log('node payout.js --send');
+    process.exit(0);
+}
+
+console.log('Sending payout...');
+
+try {
+    const txids = {};
+
+    for (const [addr, amount] of Object.entries(payouts)) {
+        const command = `${RAVEN_CLI} sendtoaddress ${addr} ${amount}`;
+
+        console.log('Executing:');
+        console.log(command);
+
+        const txid = execSync(command, { encoding: 'utf8' }).trim();
+        txids[addr] = txid;
+
+        console.log(`Paid ${amount} TH3 to ${addr}`);
+        console.log(`TXID: ${txid}`);
+    }
+
+    console.log('');
+    console.log('Payout sent successfully.');
+
+    const newState = {
+        paid_until_height: maxHeight,
+        last_payout_txids: txids,
+        last_payout_time: new Date().toISOString()
+    };
+
+    fs.writeFileSync(
+        STATE_FILE,
+        JSON.stringify(newState, null, 2) + '\n'
+    );
+
+    console.log('');
+    console.log('Updated pool-state.json:');
+    console.log(JSON.stringify(newState, null, 2));
+
+} catch (err) {
+    console.error('');
+    console.error('Payout failed.');
+    console.error(err.stdout ? err.stdout.toString() : '');
+    console.error(err.stderr ? err.stderr.toString() : '');
+    process.exit(1);
+}

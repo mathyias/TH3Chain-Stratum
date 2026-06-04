@@ -1,3 +1,7 @@
 {
-  "paid_until_height": 0
+  "paid_until_height": 117,
+  "last_payout_txids": {
+    "THFNEgh6iKXGSbEY1aKtwUxFwfDkM8mrDd": "460bd81e0d811fd8897c536541c3e78909f2c992537de3492220e7eb9040930e"
+  },
+  "last_payout_time": "2026-06-04T23:30:35.760Z"
 }
