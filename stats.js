@@ -1,8 +1,20 @@
 const fs = require('fs');
+const { execSync } = require('child_process');
 
 const REWARD_PER_BLOCK = 2137;
+const CONFIRMATION_BUFFER = 5;
+const POOL_FEE_PERCENT = 1.5;
+
 const STATE_FILE = 'pool-state.json';
 const SHARES_FILE = 'shares.jsonl';
+
+const RAVEN_CLI = '/home/ubuntu/TH3Coin/src/raven-cli';
+
+const currentHeight = Number(
+    execSync(`${RAVEN_CLI} getblockcount`, { encoding: 'utf8' }).trim()
+);
+
+const maxPayableHeight = Math.max(0, currentHeight - CONFIRMATION_BUFFER);
 
 const state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
 const paidUntilHeight = state.paid_until_height || 0;
@@ -23,8 +35,10 @@ for (const line of lines) {
 
     if (!share.validShare) continue;
     if (!share.height || share.height <= paidUntilHeight) continue;
+    if (share.height > maxPayableHeight) continue;
 
     const addr = share.address;
+
     if (!miners[addr]) {
         miners[addr] = {
             shares: 0,
@@ -46,9 +60,15 @@ for (const line of lines) {
     }
 }
 
+const totalReward = totalBlocks * REWARD_PER_BLOCK;
+const poolFee = totalReward * (POOL_FEE_PERCENT / 100);
+const minerReward = totalReward - poolFee;
+
 console.log('');
 console.log('=== TH3 POOL UNPAID STATS ===');
 console.log('Paid until height:', paidUntilHeight);
+console.log('Current chain height:', currentHeight);
+console.log('Max payable height:', maxPayableHeight);
 console.log('Current counted max height:', maxHeight);
 console.log('');
 
@@ -57,7 +77,7 @@ for (const [addr, data] of Object.entries(miners)) {
         ? data.shares / totalShares
         : 0;
 
-    const estimatedReward = sharePercent * totalBlocks * REWARD_PER_BLOCK;
+    const estimatedReward = sharePercent * minerReward;
 
     console.log('Address:', addr);
     console.log('Shares :', data.shares);
@@ -69,4 +89,6 @@ for (const [addr, data] of Object.entries(miners)) {
 
 console.log('Total Shares:', totalShares);
 console.log('Total Blocks:', totalBlocks);
-console.log('Estimated Pool Reward:', (totalBlocks * REWARD_PER_BLOCK).toFixed(8), 'TH3');
+console.log('Estimated Gross Reward:', totalReward.toFixed(8), 'TH3');
+console.log('Pool Fee:', poolFee.toFixed(8), 'TH3');
+console.log('Estimated Miner Reward:', minerReward.toFixed(8), 'TH3');
