@@ -1,0 +1,94 @@
+
+=== TH3 POOL PAYOUT ===
+Mode: SEND REAL PAYOUT
+Paid until height: 124
+Current chain height: 127
+Max payable height: 27
+Max height to mark paid: 124
+Total shares: 0
+Total blocks: 0
+Total reward: 0.00000000 TH3
+
+Payouts:
+{}
+
+Nothing to pay.
+
+=== TH3 POOL PAYOUT ===
+Mode: SEND REAL PAYOUT
+Paid until height: 124
+Current chain height: 127
+Max payable height: 122
+Max height to mark paid: 124
+Total shares: 0
+Total blocks: 0
+Total reward: 0.00000000 TH3
+
+Payouts:
+{}
+
+Nothing to pay.
+
+=== TH3 POOL PAYOUT ===
+Mode: SEND REAL PAYOUT
+Paid until height: 124
+Current chain height: 138
+Max payable height: 133
+Max height to mark paid: 133
+Total shares: 62
+Total blocks: 9
+Total reward: 19233.00000000 TH3
+
+Payouts:
+{
+  "THFNEgh6iKXGSbEY1aKtwUxFwfDkM8mrDd": 19233
+}
+
+Sending payout...
+Executing:
+/home/ubuntu/TH3Coin/src/raven-cli sendtoaddress THFNEgh6iKXGSbEY1aKtwUxFwfDkM8mrDd 19233
+Paid 19233 TH3 to THFNEgh6iKXGSbEY1aKtwUxFwfDkM8mrDd
+TXID: d33c7cdb3f19fb989762bcc7ad8ded530333dc59b9f26fdded7dfa60313d2867
+
+Payout sent successfully.
+
+Updated pool-state.json:
+{
+  "paid_until_height": 133,
+  "last_payout_txids": {
+    "THFNEgh6iKXGSbEY1aKtwUxFwfDkM8mrDd": "d33c7cdb3f19fb989762bcc7ad8ded530333dc59b9f26fdded7dfa60313d2867"
+  },
+  "last_payout_time": "2026-06-05T00:10:01.453Z"
+}
+
+=== TH3 POOL PAYOUT ===
+Mode: SEND REAL PAYOUT
+Paid until height: 133
+Current chain height: 181
+Max payable height: 176
+Max height to mark paid: 176
+Total shares: 43
+Total blocks: 43
+Total reward: 91891.00000000 TH3
+
+Payouts:
+{
+  "THFNEgh6iKXGSbEY1aKtwUxFwfDkM8mrDd": 91891
+}
+
+Sending payout...
+Executing:
+/home/ubuntu/TH3Coin/src/raven-cli sendtoaddress THFNEgh6iKXGSbEY1aKtwUxFwfDkM8mrDd 91891
+Paid 91891 TH3 to THFNEgh6iKXGSbEY1aKtwUxFwfDkM8mrDd
+TXID: 7c1f9b166cd28c0cd939e3093cec29ac09d477759cefe4f13e08120dda865a74
+
+Payout sent successfully.
+
+Updated pool-state.json:
+{
+  "paid_until_height": 176,
+  "last_payout_txids": {
+    "THFNEgh6iKXGSbEY1aKtwUxFwfDkM8mrDd": "7c1f9b166cd28c0cd939e3093cec29ac09d477759cefe4f13e08120dda865a74"
+  },
+  "last_payout_time": "2026-06-05T00:20:01.653Z"
+}

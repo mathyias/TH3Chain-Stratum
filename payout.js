@@ -2,7 +2,8 @@ const fs = require('fs');
 const { execSync } = require('child_process');
 
 const REWARD_PER_BLOCK = 2137;
-const MIN_PAYOUT = 1;
+const MIN_PAYOUT = 500;
+const CONFIRMATION_BUFFER = 5;
 
 const STATE_FILE = 'pool-state.json';
 const SHARES_FILE = 'shares.jsonl';
@@ -10,6 +11,12 @@ const SHARES_FILE = 'shares.jsonl';
 const RAVEN_CLI = '/home/ubuntu/TH3Coin/src/raven-cli';
 
 const SEND = process.argv.includes('--send');
+
+const currentHeight = Number(
+    execSync(`${RAVEN_CLI} getblockcount`, { encoding: 'utf8' }).trim()
+);
+
+const maxPayableHeight = Math.max(0, currentHeight - CONFIRMATION_BUFFER);
 
 const state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
 const paidUntilHeight = state.paid_until_height || 0;
@@ -30,6 +37,7 @@ for (const line of lines) {
 
     if (!share.validShare) continue;
     if (!share.height || share.height <= paidUntilHeight) continue;
+    if (share.height > maxPayableHeight) continue;
 
     const addr = share.address;
 
@@ -69,6 +77,9 @@ console.log('');
 console.log('=== TH3 POOL PAYOUT ===');
 console.log('Mode:', SEND ? 'SEND REAL PAYOUT' : 'DRY RUN');
 console.log('Paid until height:', paidUntilHeight);
+console.log('Current chain height:', currentHeight);
+console.log('Max payable height:', maxPayableHeight);
+
 console.log('Max height to mark paid:', maxHeight);
 console.log('Total shares:', totalShares);
 console.log('Total blocks:', totalBlocks);
