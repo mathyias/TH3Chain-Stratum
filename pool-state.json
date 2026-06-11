@@ -1,8 +1,0 @@
-{
-  "paid_until_height": 215,
-  "last_payout_txids": {
-    "THFNEgh6iKXGSbEY1aKtwUxFwfDkM8mrDd": "bc62aab191bf1ac065736a5d7dac6f1bc62d26aac7b7fa927a92d4a6743def80"
-  },
-  "last_payout_time": "2026-06-05T16:50:01.451Z",
-  "pool_fee_percent": 1.5
-}
