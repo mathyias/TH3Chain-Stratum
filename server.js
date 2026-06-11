@@ -431,10 +431,10 @@ var pool = Stratum.createPool({
 
   coin: myCoin,
 
-  address: 'TMayfrrfFTqjNf4esHnXYpFX3MfQ6Qs9BV',
+  address: 'TH31FhY83qCetgyBnmcEqNr7dMfmntHhuvjbm',
 
   rewardRecipients: {
-    'TMayfrrfFTqjNf4esHnXYpFX3MfQ6Qs9BV': 1.5
+    'TH31FhY83qCetgyBnmcEqNr7dMfmntHhuvjbm': 1.5
   },
 
   blockRefreshInterval: 1000,
