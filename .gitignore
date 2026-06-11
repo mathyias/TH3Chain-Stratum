@@ -1,0 +1,8 @@
+node_modules/
+*.log
+payout-cron.log
+shares.jsonl
+payout-history.jsonl
+pool-state.json
+.env
+.DS_Store

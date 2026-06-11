@@ -18,7 +18,7 @@ var MIN_PAYOUT = 500;
 var CONFIRMATION_BUFFER = 5;
 var POOL_FEE_PERCENT = 1.5;
 
-var RAVEN_CLI = '/home/ubuntu/TH3Coin/src/raven-cli';
+var TH3_CLI = '/home/ubuntu/TH3Coin/src/th3-cli';
 
 var SHARES_FILE = path.join(__dirname, 'shares.jsonl');
 var STATE_FILE = path.join(__dirname, 'pool-state.json');
@@ -45,7 +45,7 @@ function safeJsonFile(file, fallback) {
 function getCurrentHeight() {
   try {
     return Number(
-      execSync(RAVEN_CLI + ' getblockcount', { encoding: 'utf8' }).trim()
+      execSync(TH3_CLI + ' getblockcount', { encoding: 'utf8' }).trim()
     );
   } catch (e) {
     return 0;

@@ -8,10 +8,10 @@ const POOL_FEE_PERCENT = 1.5;
 const STATE_FILE = 'pool-state.json';
 const SHARES_FILE = 'shares.jsonl';
 
-const RAVEN_CLI = '/home/ubuntu/TH3Coin/src/raven-cli';
+const TH3_CLI = '/home/ubuntu/TH3Coin/src/th3-cli';
 
 const currentHeight = Number(
-    execSync(`${RAVEN_CLI} getblockcount`, { encoding: 'utf8' }).trim()
+    execSync(`${TH3_CLI} getblockcount`, { encoding: 'utf8' }).trim()
 );
 
 const maxPayableHeight = Math.max(0, currentHeight - CONFIRMATION_BUFFER);

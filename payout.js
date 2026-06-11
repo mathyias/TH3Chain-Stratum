@@ -10,12 +10,12 @@ const STATE_FILE = 'pool-state.json';
 const SHARES_FILE = 'shares.jsonl';
 const PAYOUT_HISTORY_FILE = 'payout-history.jsonl';
 
-const RAVEN_CLI = '/home/ubuntu/TH3Coin/src/raven-cli';
+const TH3_CLI = '/home/ubuntu/TH3Coin/src/th3-cli';
 
 const SEND = process.argv.includes('--send');
 
 const currentHeight = Number(
-    execSync(`${RAVEN_CLI} getblockcount`, { encoding: 'utf8' }).trim()
+    execSync(`${TH3_CLI} getblockcount`, { encoding: 'utf8' }).trim()
 );
 
 const maxPayableHeight = Math.max(0, currentHeight - CONFIRMATION_BUFFER);
@@ -112,7 +112,7 @@ try {
     const txids = {};
 
     for (const [addr, amount] of Object.entries(payouts)) {
-        const command = `${RAVEN_CLI} sendtoaddress ${addr} ${amount}`;
+        const command = `${TH3_CLI} sendtoaddress ${addr} ${amount}`;
 
         console.log('Executing:');
         console.log(command);
