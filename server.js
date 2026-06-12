@@ -170,7 +170,7 @@ function loadPayoutHistory(limit) {
 }
 
 function buildStatsFromFile() {
-  var shares = loadJsonLines(SHARES_FILE, 10000);
+  var shares = loadJsonLines(SHARES_FILE);
   var miners = {};
   var validShares = 0;
   var invalidShares = 0;
