@@ -133,6 +133,20 @@ function recordShare(isValidShare, isValidBlock, data) {
   );
 }
 
+
+var HASHRATE_WINDOW_MS = 10 * 60 * 1000;
+
+function timeToMs(value) {
+  if (!value) return 0;
+  var parsed = Date.parse(value);
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function hashrateFromDifficulty(totalDifficulty, windowMs) {
+  var seconds = Math.max(1, windowMs / 1000);
+  return (Number(totalDifficulty || 0) * Math.pow(2, 32)) / seconds;
+}
+
 function loadJsonLines(file, limit) {
   try {
     if (!fs.existsSync(file)) return [];
@@ -172,13 +186,19 @@ function loadPayoutHistory(limit) {
 function buildStatsFromFile() {
   var shares = loadJsonLines(SHARES_FILE);
   var miners = {};
+  var activeMiners = {};
   var validShares = 0;
   var invalidShares = 0;
   var validBlocks = 0;
+  var now = Date.now();
+  var activeCutoff = now - HASHRATE_WINDOW_MS;
+  var poolRecentDifficulty = 0;
 
   shares.forEach(function(share) {
     var address = share.address || 'unknown';
     var worker = share.worker || 'unknown';
+    var shareTime = timeToMs(share.time);
+    var recentDifficulty = Number(share.difficulty || 0);
 
     if (!miners[address]) {
       miners[address] = {
@@ -187,7 +207,9 @@ function buildStatsFromFile() {
         validShares: 0,
         invalidShares: 0,
         validBlocks: 0,
-        lastSeen: null
+        lastSeen: null,
+        hashrate: 0,
+        recentDifficulty: 0
       };
     }
 
@@ -197,7 +219,9 @@ function buildStatsFromFile() {
         validShares: 0,
         invalidShares: 0,
         validBlocks: 0,
-        lastSeen: null
+        lastSeen: null,
+        hashrate: 0,
+        recentDifficulty: 0
       };
     }
 
@@ -205,6 +229,13 @@ function buildStatsFromFile() {
       validShares += 1;
       miners[address].validShares += 1;
       miners[address].workers[worker].validShares += 1;
+
+      if (shareTime >= activeCutoff) {
+        activeMiners[address] = true;
+        poolRecentDifficulty += recentDifficulty;
+        miners[address].recentDifficulty += recentDifficulty;
+        miners[address].workers[worker].recentDifficulty += recentDifficulty;
+      }
     } else {
       invalidShares += 1;
       miners[address].invalidShares += 1;
@@ -223,18 +254,28 @@ function buildStatsFromFile() {
 
   Object.values(miners).forEach(function(miner) {
     miner.status = getMinerStatus(miner.lastSeen);
+    miner.hashrate = hashrateFromDifficulty(miner.recentDifficulty, HASHRATE_WINDOW_MS);
+    delete miner.recentDifficulty;
 
     Object.values(miner.workers).forEach(function(worker) {
       worker.status = getMinerStatus(worker.lastSeen);
+      worker.hashrate = hashrateFromDifficulty(worker.recentDifficulty, HASHRATE_WINDOW_MS);
+      delete worker.recentDifficulty;
     });
   });
+
+  var activeMinerCount = Object.keys(activeMiners).length;
+  var totalMinerCount = Object.keys(miners).length;
 
   return {
     startedAt: poolStats.startedAt,
     validShares: validShares,
     invalidShares: invalidShares,
     validBlocks: validBlocks,
-    minerCount: Object.keys(miners).length,
+    minerCount: activeMinerCount,
+    activeMinerCount: activeMinerCount,
+    totalMinerCount: totalMinerCount,
+    hashrate: hashrateFromDifficulty(poolRecentDifficulty, HASHRATE_WINDOW_MS),
     miners: miners,
     recentShares: loadRecentShares(50)
   };
@@ -350,6 +391,9 @@ function startStatsServer() {
         invalidShares: stats.invalidShares,
         validBlocks: stats.validBlocks,
         minerCount: stats.minerCount,
+        activeMinerCount: stats.activeMinerCount,
+        totalMinerCount: stats.totalMinerCount,
+        hashrate: stats.hashrate,
         pendingGrossReward: pending.grossReward,
         pendingPoolFee: pending.poolFee,
         pendingMinerReward: pending.minerReward,
@@ -403,6 +447,7 @@ function startStatsServer() {
         validShares: miner.validShares,
         invalidShares: miner.invalidShares,
         validBlocks: miner.validBlocks,
+        hashrate: miner.hashrate,
         lastSeen: miner.lastSeen,
         workers: Object.values(miner.workers),
         pendingReward: pendingMiner.pending,
